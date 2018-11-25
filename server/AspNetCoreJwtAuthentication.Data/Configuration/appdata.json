@@ -1,0 +1,5 @@
+{
+  "AppData": {
+    "DatabaseConnectionString": "Server=(localdb)\\mssqllocaldb;Database=AspNetCoreJwtAuthentication;Trusted_Connection=True;Connect Timeout=100"
+  }
+}
