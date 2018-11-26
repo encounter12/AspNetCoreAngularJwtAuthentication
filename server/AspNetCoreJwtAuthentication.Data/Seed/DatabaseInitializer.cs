@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,8 +57,29 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager)
         {
+
+            if (!context.Roles.Any())
+            {
+                var roles = new List<IdentityRole>()
+                {
+                    new IdentityRole()
+                    {
+                        Name = "Administrator"
+                    },
+                    new IdentityRole()
+                    {
+                        Name = "StandardUser"
+                    }
+                };
+
+                context.Roles.AddRange(roles);
+                context.SaveChanges();
+            }
+
             if (!context.Users.Any())
             {
+                var appUser = new ApplicationUser();
+
                 var usersWithPasswords = new List<UserWithPassword>
                 {
                     new UserWithPassword

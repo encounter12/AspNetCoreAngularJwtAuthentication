@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using AspNetCoreJwtAuthentication.Api.ViewModels;
 using AspNetCoreJwtAuthentication.Models.IdentityModels;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspNetCoreJwtAuthentication.Api.Controllers
 {
@@ -47,16 +49,16 @@ namespace AspNetCoreJwtAuthentication.Api.Controllers
 
                 if (result.Succeeded)
                 {
-                    ApplicationUser user = await userManager.FindByNameAsync(model.Username);
+                    ApplicationUser applicationUser = await userManager.FindByNameAsync(model.Username);
 
                     var userModel = new UserModel()
                     {
-                        Name = user.UserName,
-                        Email = user.Email,
-                        Birthdate = user.Birthdate
+                        Name = applicationUser.UserName,
+                        Email = applicationUser.Email,
+                        Birthdate = applicationUser.Birthdate
                     };
 
-                    var tokenString = this.BuildToken(userModel);
+                    var tokenString = await this.BuildToken(userModel, applicationUser);
 
                     return Ok(
                         new
@@ -76,17 +78,21 @@ namespace AspNetCoreJwtAuthentication.Api.Controllers
             return BadRequest();
         }
 
-        private string BuildToken(UserModel user)
+        private async Task<string> BuildToken(UserModel user, ApplicationUser applicationUser)
         {
             JwtSettings jwtSettings = this.configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
-            var claims = new[] 
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Name),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Birthdate, user.Birthdate.ToString("yyyy-MM-dd")),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            var userRoleClaims = await this.GetUserRoleClaims(applicationUser);
+
+            claims.AddRange(userRoleClaims);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -99,6 +105,17 @@ namespace AspNetCoreJwtAuthentication.Api.Controllers
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private async Task<List<Claim>> GetUserRoleClaims(ApplicationUser applicationUser)
+        {
+            IList<string> userRoles = await userManager.GetRolesAsync(applicationUser);
+
+            var userRoleClaims = userRoles
+                .Select(role => new Claim(ClaimTypes.Role, role))
+                .ToList();
+
+            return userRoleClaims;
         }
     }
 }
