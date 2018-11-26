@@ -16,4 +16,10 @@
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.DI\AspNetCoreJwtAuthentication.DI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

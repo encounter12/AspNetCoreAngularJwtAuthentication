@@ -1,24 +1,24 @@
-﻿using System.Linq;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design.Internal;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Design;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 
 using AspNetCoreJwtAuthentication.Data.Context;
 using AspNetCoreJwtAuthentication.Models.IdentityModels;
 using AspNetCoreJwtAuthentication.Models.DomainModels;
-using Microsoft.EntityFrameworkCore.Design.Internal;
-using Microsoft.EntityFrameworkCore.Design;
-using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Migrations.Design;
-using System.IO;
-using System;
 
 namespace AspNetCoreJwtAuthentication.Data.Seed
 {
@@ -67,7 +67,8 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
                         ApplicationUser = new ApplicationUser()
                         {
                             UserName = "alice",
-                            Email = "alice@sample.com"
+                            Email = "alice@sample.com",
+                            Birthdate = new DateTime(1985, 04, 23)
                         },
                         Password = "alice"
                     }
@@ -77,7 +78,8 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
                         ApplicationUser = new ApplicationUser()
                         {
                             UserName = "bob",
-                            Email = "bob@sample.com"
+                            Email = "bob@sample.com",
+                            Birthdate = new DateTime(1990, 02, 15)
                         },
                         Password = "bob"
                     }

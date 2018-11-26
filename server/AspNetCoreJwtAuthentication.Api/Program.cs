@@ -40,6 +40,7 @@ namespace AspNetCoreJwtAuthentication.Api
                 {
                     config.SetBasePath(AppContext.BaseDirectory);
                     config.AddJsonFile("Configuration/appdata.json", optional: false, reloadOnChange: false);
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
                     config.AddCommandLine(args);
                 })
                 .UseStartup<Startup>();
