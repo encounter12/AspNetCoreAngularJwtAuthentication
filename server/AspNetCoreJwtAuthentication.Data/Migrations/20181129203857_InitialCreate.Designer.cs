@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspNetCoreJwtAuthentication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181126211239_BirthdateProp")]
-    partial class BirthdateProp
+    [Migration("20181129203857_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

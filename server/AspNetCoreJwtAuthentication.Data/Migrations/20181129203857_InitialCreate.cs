@@ -41,6 +41,7 @@ namespace AspNetCoreJwtAuthentication.Data.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
+                    Birthdate = table.Column<DateTime>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
@@ -58,16 +59,16 @@ namespace AspNetCoreJwtAuthentication.Data.Migrations
                 name: "Reports",
                 columns: table => new
                 {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
                     CreatedOn = table.Column<DateTime>(nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<string>(nullable: true),
                     Deleted = table.Column<bool>(nullable: false),
                     DeletedOn = table.Column<DateTime>(nullable: true),
-                    DeletedBy = table.Column<string>(nullable: true),
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    DeletedBy = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
