@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using AspNetCoreJwtAuthentication.Api.ViewModels;
 using AspNetCoreJwtAuthentication.Models.IdentityModels;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AspNetCoreJwtAuthentication.Api.Controllers
 {
@@ -60,14 +60,9 @@ namespace AspNetCoreJwtAuthentication.Api.Controllers
 
                     var tokenString = await this.BuildToken(userModel, applicationUser);
 
-                    return Ok(
-                        new
-                        {
-                            token = tokenString
-                        });
+                    return Ok(new { token = tokenString });
 
-                    //TODO: create access token and return it to client
-                    //See articles: 
+                    //Generating JWT token articles: 
                     //https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
                     //http://jasonwatmore.com/post/2018/08/14/aspnet-core-21-jwt-authentication-tutorial-with-example-api
                     //https://github.com/openiddict/openiddict-samples/blob/dev/samples/PasswordFlow/AuthorizationServer/Controllers/AuthorizationController.cs

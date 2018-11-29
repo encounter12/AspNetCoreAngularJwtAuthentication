@@ -57,18 +57,19 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager)
         {
-
             if (!context.Roles.Any())
             {
                 var roles = new List<IdentityRole>()
                 {
                     new IdentityRole()
                     {
-                        Name = "Administrator"
+                        Name = Roles.Administrator.ToString(),
+                        NormalizedName = Roles.Administrator.ToString().ToUpper()
                     },
                     new IdentityRole()
                     {
-                        Name = "StandardUser"
+                        Name = Roles.StandardUser.ToString(),
+                        NormalizedName = Roles.StandardUser.ToString().ToUpper()
                     }
                 };
 
@@ -78,39 +79,52 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
 
             if (!context.Users.Any())
             {
-                var appUser = new ApplicationUser();
+                var applicationUserAlice = new ApplicationUser()
+                {
+                    UserName = "alice",
+                    Email = "alice@sample.com",
+                    Birthdate = new DateTime(1985, 04, 23)
+                };
+
+                var applicationUserBob = new ApplicationUser()
+                {
+                    UserName = "bob",
+                    Email = "bob@sample.com",
+                    Birthdate = new DateTime(1990, 02, 15)
+                };
 
                 var usersWithPasswords = new List<UserWithPassword>
                 {
                     new UserWithPassword
                     {
-                        ApplicationUser = new ApplicationUser()
-                        {
-                            UserName = "alice",
-                            Email = "alice@sample.com",
-                            Birthdate = new DateTime(1985, 04, 23)
-                        },
+                        ApplicationUser = applicationUserAlice,
                         Password = "alice"
-                    }
-                    ,
+                    },
                     new UserWithPassword
                     {
-                        ApplicationUser = new ApplicationUser()
-                        {
-                            UserName = "bob",
-                            Email = "bob@sample.com",
-                            Birthdate = new DateTime(1990, 02, 15)
-                        },
+                        ApplicationUser = applicationUserBob,
                         Password = "bob"
                     }
                 };
 
+                IdentityResult result;
+
                 foreach (var userWithPassword in usersWithPasswords)
                 {
-                    IdentityResult result = await userManager.CreateAsync(
+                    result = await userManager.CreateAsync(
                         userWithPassword.ApplicationUser,
                         userWithPassword.Password);
                 }
+
+                context.SaveChanges();
+
+                result = await userManager.AddToRoleAsync(
+                    applicationUserAlice,
+                    Roles.Administrator.ToString());
+
+                result = await userManager.AddToRoleAsync(
+                    applicationUserBob,
+                    Roles.StandardUser.ToString());
 
                 context.SaveChanges();
             }
@@ -179,6 +193,12 @@ namespace AspNetCoreJwtAuthentication.Data.Seed
             public ApplicationUser ApplicationUser { get; set; }
 
             public string Password { get; set; }
+        }
+
+        private enum Roles
+        {
+            Administrator,
+            StandardUser
         }
     }
 }

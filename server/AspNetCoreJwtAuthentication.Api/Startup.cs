@@ -14,6 +14,7 @@ using AspNetCoreJwtAuthentication.DI;
 using AspNetCoreJwtAuthentication.DI.Enums;
 using AspNetCoreJwtAuthentication.Models.IdentityModels;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreJwtAuthentication.Api
 {
@@ -33,7 +34,8 @@ namespace AspNetCoreJwtAuthentication.Api
 
             JwtSettings jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -47,6 +49,15 @@ namespace AspNetCoreJwtAuthentication.Api
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
                 });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdministratorRole",  
+                    new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .RequireRole("Administrator")
+                        .Build());
+            });
 
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 options =>
