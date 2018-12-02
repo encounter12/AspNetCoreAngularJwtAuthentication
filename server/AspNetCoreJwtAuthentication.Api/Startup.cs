@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,17 +13,20 @@ using Microsoft.IdentityModel.Tokens;
 using AspNetCoreJwtAuthentication.Data.Context;
 using AspNetCoreJwtAuthentication.DI;
 using AspNetCoreJwtAuthentication.DI.Enums;
+using AspNetCoreJwtAuthentication.Middleware;
 using AspNetCoreJwtAuthentication.Models.IdentityModels;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
-using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreJwtAuthentication.Api
 {
     public class Startup
     {
+        private readonly JwtSettings jwtSettings;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            this.jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();
         }
 
         public IConfiguration Configuration { get; }
@@ -31,8 +35,6 @@ namespace AspNetCoreJwtAuthentication.Api
         {
             AppData appData = Configuration.GetSection("AppData").Get<AppData>();
             services.AddDependencyInjectionContainer(DiContainers.AspNetCoreDependencyInjector, appData);
-
-            JwtSettings jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -44,8 +46,8 @@ namespace AspNetCoreJwtAuthentication.Api
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings.Issuer,
-                        ValidAudience = jwtSettings.Issuer,
+                        ValidIssuer = this.jwtSettings.Issuer,
+                        ValidAudience = this.jwtSettings.Issuer,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
                     };
                 });
@@ -95,6 +97,8 @@ namespace AspNetCoreJwtAuthentication.Api
             app.UseAuthentication();
 
             app.UseCors("CorsPolicy");
+
+            app.UseJwtTokenIssuer(this.jwtSettings);
 
             app.UseMvc();
         }

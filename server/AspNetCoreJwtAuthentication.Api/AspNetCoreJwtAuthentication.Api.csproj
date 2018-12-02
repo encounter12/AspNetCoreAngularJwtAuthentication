@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.DI\AspNetCoreJwtAuthentication.DI.csproj" />
+    <ProjectReference Include="..\AspNetCoreJwtAuthentication.Middleware\AspNetCoreJwtAuthentication.Middleware.csproj" />
   </ItemGroup>
 
   <ItemGroup>

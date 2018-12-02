@@ -23,7 +23,7 @@ namespace AspNetCoreJwtAuthentication.Api.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
-        private IConfiguration configuration;
+        private readonly IConfiguration configuration;
 
         public TokenController(
             UserManager<ApplicationUser> userManager,

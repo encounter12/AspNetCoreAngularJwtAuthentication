@@ -5,13 +5,15 @@ VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreJwtAuthentication.Api", "AspNetCoreJwtAuthentication.Api\AspNetCoreJwtAuthentication.Api.csproj", "{B82AED18-5A10-42F6-8D37-F69185067F16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreJwtAuthentication.Data", "AspNetCoreJwtAuthentication.Data\AspNetCoreJwtAuthentication.Data.csproj", "{A1A4EBAD-503C-41CB-A806-66F51609CCAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreJwtAuthentication.Data", "AspNetCoreJwtAuthentication.Data\AspNetCoreJwtAuthentication.Data.csproj", "{A1A4EBAD-503C-41CB-A806-66F51609CCAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreJwtAuthentication.Models", "AspNetCoreJwtAuthentication.Models\AspNetCoreJwtAuthentication.Models.csproj", "{38907B15-4D11-4F92-9D22-149DFE8DB746}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreJwtAuthentication.Models", "AspNetCoreJwtAuthentication.Models\AspNetCoreJwtAuthentication.Models.csproj", "{38907B15-4D11-4F92-9D22-149DFE8DB746}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreJwtAuthentication.Services", "AspNetCoreJwtAuthentication.Services\AspNetCoreJwtAuthentication.Services.csproj", "{BBA16F55-55FB-4615-868D-4215F2D958B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreJwtAuthentication.Services", "AspNetCoreJwtAuthentication.Services\AspNetCoreJwtAuthentication.Services.csproj", "{BBA16F55-55FB-4615-868D-4215F2D958B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreJwtAuthentication.DI", "AspNetCoreJwtAuthentication.DI\AspNetCoreJwtAuthentication.DI.csproj", "{F99E4A6B-AC99-472D-AAE7-C25019A390B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreJwtAuthentication.DI", "AspNetCoreJwtAuthentication.DI\AspNetCoreJwtAuthentication.DI.csproj", "{F99E4A6B-AC99-472D-AAE7-C25019A390B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreJwtAuthentication.Middleware", "AspNetCoreJwtAuthentication.Middleware\AspNetCoreJwtAuthentication.Middleware.csproj", "{05612B70-7F02-4D91-AE8A-22C5FDEC30AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F99E4A6B-AC99-472D-AAE7-C25019A390B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F99E4A6B-AC99-472D-AAE7-C25019A390B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F99E4A6B-AC99-472D-AAE7-C25019A390B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05612B70-7F02-4D91-AE8A-22C5FDEC30AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05612B70-7F02-4D91-AE8A-22C5FDEC30AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05612B70-7F02-4D91-AE8A-22C5FDEC30AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05612B70-7F02-4D91-AE8A-22C5FDEC30AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
