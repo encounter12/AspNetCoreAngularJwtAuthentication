@@ -2,8 +2,14 @@
 {
     public class JwtSettings
     {
-        public string Key { get; set; }
+        public string Path { get; set; }
+
+        public string HmacSha256Key { get; set; }
 
         public string Issuer { get; set; }
+
+        public int ExpiresIn { get; set; }
+
+        public string Alg { get; set; }
     }
 }

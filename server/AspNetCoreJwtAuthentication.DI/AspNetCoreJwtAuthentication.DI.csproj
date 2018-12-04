@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.Data\AspNetCoreJwtAuthentication.Data.csproj" />
+    <ProjectReference Include="..\AspNetCoreJwtAuthentication.Middleware\AspNetCoreJwtAuthentication.Middleware.csproj" />
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.Services\AspNetCoreJwtAuthentication.Services.csproj" />
   </ItemGroup>
 

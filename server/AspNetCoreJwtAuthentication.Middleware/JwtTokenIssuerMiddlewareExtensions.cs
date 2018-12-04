@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Security.Principal;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
@@ -7,17 +12,14 @@ namespace AspNetCoreJwtAuthentication.Middleware
 {
     public static class JwtTokenIssuerMiddlewareExtensions
     {
-        public static IApplicationBuilder UseJwtTokenIssuer(this IApplicationBuilder builder)
+        public static void UseJwtTokenIssuer(
+            this IApplicationBuilder app,
+            JwtSettings jwtSettings,
+            Func<HttpContext, Task<GenericPrincipal>> principalResolver)
         {
-            return builder.UseMiddleware<JwtTokenIssuerMiddleware>();
-        }
-
-        public static IApplicationBuilder UseJwtTokenIssuer(
-            this IApplicationBuilder builder, 
-            JwtSettings jwtSettings)
-        {
-            return builder.UseMiddleware<JwtTokenIssuerMiddleware>(
-                new OptionsWrapper<JwtSettings>(jwtSettings));
+            app.UseMiddleware<JwtTokenIssuerMiddleware>(
+                new OptionsWrapper<JwtSettings>(jwtSettings),
+                principalResolver);
         }
     }
 }
