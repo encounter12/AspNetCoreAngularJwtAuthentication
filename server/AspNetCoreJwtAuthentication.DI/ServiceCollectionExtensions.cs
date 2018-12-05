@@ -51,11 +51,10 @@ namespace AspNetCoreJwtAuthentication.DI
             if (jwtSettings.Alg == SecurityAlgorithms.HmacSha256)
             {
                 services.AddSingleton<IJwtHandler>(new JwtHandlerHmacSha256(jwtSettings));
-                //services.AddSingleton<IJwtHandler, JwtHandlerHmacSha256>();
             }
             else if (jwtSettings.Alg == SecurityAlgorithms.RsaSha256)
             {
-                services.AddSingleton<IJwtHandler, JwtHandlerRsaSha256>();
+                services.AddSingleton<IJwtHandler>(new JwtHandlerRsaSha256(jwtSettings));
             }
             else
             {
