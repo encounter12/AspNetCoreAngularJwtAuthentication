@@ -5,12 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
 
 namespace AspNetCoreJwtAuthentication.Middleware
@@ -37,8 +32,6 @@ namespace AspNetCoreJwtAuthentication.Middleware
             long unixTimeSeconds = (long)Math.Round(
                 (utcNow.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
 
-            var signingCredentials = new SigningCredentials(this.issuerSigningKey, SecurityAlgorithms.HmacSha256);
-
             var existingClaims = genericPrincipal.Claims.ToList();
 
             var systemClaims = new List<Claim>
@@ -49,6 +42,8 @@ namespace AspNetCoreJwtAuthentication.Middleware
             };
 
             existingClaims.AddRange(systemClaims);
+
+            var signingCredentials = new SigningCredentials(this.issuerSigningKey, SecurityAlgorithms.HmacSha256);
 
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: jwtSettings.Issuer,
