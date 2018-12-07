@@ -54,7 +54,7 @@ namespace AspNetCoreJwtAuthentication.DI
             }
             else if (jwtSettings.Alg == SecurityAlgorithms.RsaSha256)
             {
-                services.AddSingleton<IJwtHandler>(new JwtHandlerRsaSha256(jwtSettings));
+                services.AddSingleton<IJwtHandler>(new JwtHandlerRsaSha256(jwtSettings, new CryptoKeysProvider()));
             }
             else
             {

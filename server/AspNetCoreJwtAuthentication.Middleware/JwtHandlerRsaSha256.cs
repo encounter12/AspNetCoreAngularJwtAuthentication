@@ -18,15 +18,18 @@ namespace AspNetCoreJwtAuthentication.Middleware
 {
     public class JwtHandlerRsaSha256 : IJwtHandler
     {
+        private readonly ICryptoKeysProvider cryptoKeysProvider;
+
         private readonly JwtSettings jwtSettings;
 
         private SecurityKey issuerSigningKey;
 
         public TokenValidationParameters Parameters { get; private set; }
 
-        public JwtHandlerRsaSha256(JwtSettings jwtSettings)
+        public JwtHandlerRsaSha256(JwtSettings jwtSettings, ICryptoKeysProvider cryptoKeysProvider)
         {
             this.jwtSettings = jwtSettings;
+            this.cryptoKeysProvider = cryptoKeysProvider;
             InitializeRsa256();
             InitializeJwtParameters();
         }
@@ -49,18 +52,9 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
             existingClaims.AddRange(systemClaims);
 
-            string privateKeyRelativeDirectory = "Keys";
-            string privateKeyFileName = "privateKey.pem";
+            string privateKeyFileContent = this.cryptoKeysProvider.GetPrivateKey();
 
-            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string privateKeyFilePath = Path.Combine(
-                currentAssemblyDirectory,
-                privateKeyRelativeDirectory,
-                privateKeyFileName);
-
-            string privateKeyPemFileContent = File.ReadAllText(privateKeyFilePath);
-
-            var token = this.CreateToken(existingClaims, utcNow, privateKeyPemFileContent);
+            var token = this.CreateToken(existingClaims, utcNow, privateKeyFileContent);
 
             return token;
         }
@@ -75,10 +69,12 @@ namespace AspNetCoreJwtAuthentication.Middleware
                 {
                     var pemReader = new PemReader(tr);
                     var keyPair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
+
                     if (keyPair == null)
                     {
                         throw new Exception("Could not read RSA private key");
                     }
+
                     var privateKeyParameters = keyPair.Private as RsaPrivateCrtKeyParameters;
                     rsaParameters = DotNetUtilities.ToRSAParameters(privateKeyParameters);
                 }
@@ -105,25 +101,29 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
         private void InitializeRsa256()
         {
-            string publicKey = File.ReadAllText(@"E:\Projects\AspNetCoreAngularJwtAuthentication\server\AspNetCoreJwtAuthentication.Middleware\Keys\publicKey.pem");
-            RSA publicRsa = this.PublicKeyFromPemFile(publicKey);
+            string publicKeyFileContent = this.cryptoKeysProvider.GetPublicKey();
+
+            RSA publicRsa = this.BuildCryptoServiceProvider(publicKeyFileContent);
             this.issuerSigningKey = new RsaSecurityKey(publicRsa);
         }
 
-        private RSACryptoServiceProvider PublicKeyFromPemFile(string publicKey)
+        private RSACryptoServiceProvider BuildCryptoServiceProvider(string keyFileContent)
         {
-            using (var publicKeyTextReader = new StringReader(publicKey))
+            using (var keyTextReader = new StringReader(keyFileContent))
             {
-                var pemReader = new PemReader(publicKeyTextReader);
-                RsaKeyParameters publicKeyParameters = (RsaKeyParameters)pemReader.ReadObject();
-                var parameters = new RSAParameters();
+                var pemReader = new PemReader(keyTextReader);
+                RsaKeyParameters rsaKeyParameters = (RsaKeyParameters)pemReader.ReadObject();
 
-                parameters.Modulus = publicKeyParameters.Modulus.ToByteArrayUnsigned();
-                parameters.Exponent = publicKeyParameters.Exponent.ToByteArrayUnsigned();
+                var rsaParameters = new RSAParameters
+                {
+                    Modulus = rsaKeyParameters.Modulus.ToByteArrayUnsigned(),
+                    Exponent = rsaKeyParameters.Exponent.ToByteArrayUnsigned()
+                };
 
-                RSACryptoServiceProvider cryptoServiceProvider = new RSACryptoServiceProvider();
-                cryptoServiceProvider.ImportParameters(parameters);
-                return cryptoServiceProvider;
+                var rsaCryptoServiceProvider = new RSACryptoServiceProvider();
+                rsaCryptoServiceProvider.ImportParameters(rsaParameters);
+
+                return rsaCryptoServiceProvider;
             }
         }
 
@@ -139,6 +139,19 @@ namespace AspNetCoreJwtAuthentication.Middleware
                 ValidAudience = this.jwtSettings.Issuer,
                 IssuerSigningKey = this.issuerSigningKey
             };
+        }
+
+        private string GetCryptoKeysAbsoluteDirectory()
+        {
+            string cryptoKeysRelativeDirectory = "Keys";
+
+            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string cryptoKeysAbsoluteDirectory = Path.Combine(
+                currentAssemblyDirectory,
+                cryptoKeysRelativeDirectory);
+
+            return cryptoKeysAbsoluteDirectory;
         }
     }
 }
