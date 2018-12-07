@@ -31,4 +31,13 @@
     <Folder Include="Keys\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Keys\privateKey.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Keys\publicKey.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

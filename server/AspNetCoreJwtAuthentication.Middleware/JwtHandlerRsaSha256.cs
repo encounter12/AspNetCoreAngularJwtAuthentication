@@ -12,6 +12,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using System.Reflection;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
@@ -48,9 +49,18 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
             existingClaims.AddRange(systemClaims);
 
-            string privateKey = File.ReadAllText(@"E:\Projects\AspNetCoreAngularJwtAuthentication\server\AspNetCoreJwtAuthentication.Middleware\Keys\privateKey.pem");
+            string privateKeyRelativeDirectory = "Keys";
+            string privateKeyFileName = "privateKey.pem";
 
-            var token = this.CreateToken(existingClaims, utcNow, privateKey);
+            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string privateKeyFilePath = Path.Combine(
+                currentAssemblyDirectory,
+                privateKeyRelativeDirectory,
+                privateKeyFileName);
+
+            string privateKeyPemFileContent = File.ReadAllText(privateKeyFilePath);
+
+            var token = this.CreateToken(existingClaims, utcNow, privateKeyPemFileContent);
 
             return token;
         }
