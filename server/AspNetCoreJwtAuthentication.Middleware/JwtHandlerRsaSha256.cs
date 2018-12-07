@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
@@ -12,7 +13,6 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
-using System.Reflection;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
