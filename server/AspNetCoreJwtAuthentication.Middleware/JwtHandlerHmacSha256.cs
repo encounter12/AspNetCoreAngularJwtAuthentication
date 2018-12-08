@@ -6,21 +6,25 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using AspNetCoreJwtAuthentication.Services.Configuration;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
     public class JwtHandlerHmacSha256 : IJwtHandler
     {
-        private readonly JwtSettings jwtSettings;
+        private readonly IConfigurationService configurationService;
+        private readonly ICryptoHmacShaKeyProvider cryptoHmacShaKeyProvider;
 
         private SecurityKey issuerSigningKey;
 
         public TokenValidationParameters Parameters { get; private set; }
 
-        public JwtHandlerHmacSha256(JwtSettings jwtSettings)
+        public JwtHandlerHmacSha256(
+            IConfigurationService configurationService,
+            ICryptoHmacShaKeyProvider cryptoHmacShaKeyProvider)
         {
-            this.jwtSettings = jwtSettings;
+            this.configurationService = configurationService;
+            this.cryptoHmacShaKeyProvider = cryptoHmacShaKeyProvider;
             InitializeHmacSha256();
             InitializeJwtParameters();
         }
@@ -46,11 +50,11 @@ namespace AspNetCoreJwtAuthentication.Middleware
             var signingCredentials = new SigningCredentials(this.issuerSigningKey, SecurityAlgorithms.HmacSha256);
 
             JwtSecurityToken token = new JwtSecurityToken(
-                issuer: jwtSettings.Issuer,
-                audience: jwtSettings.Issuer,
+                issuer: configurationService.JwtSettings?.Issuer,
+                audience: configurationService.JwtSettings?.Issuer,
                 claims: existingClaims,
                 notBefore: utcNow,
-                expires: utcNow.AddMinutes(this.jwtSettings.ExpiresIn),
+                expires: utcNow.AddMinutes(this.configurationService.JwtSettings?.ExpiresIn ?? 30),
                 signingCredentials: signingCredentials);
 
             string writtenToken = new JwtSecurityTokenHandler().WriteToken(token);
@@ -59,7 +63,8 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
         private void InitializeHmacSha256()
         {
-            this.issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.jwtSettings.HmacSha256Key));
+            string secretKey = this.cryptoHmacShaKeyProvider.GetSecretKey();
+            this.issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         }
 
         private void InitializeJwtParameters()
@@ -70,8 +75,8 @@ namespace AspNetCoreJwtAuthentication.Middleware
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = this.jwtSettings.Issuer,
-                ValidAudience = this.jwtSettings.Issuer,
+                ValidIssuer = this.configurationService.JwtSettings?.Issuer,
+                ValidAudience = this.configurationService.JwtSettings?.Issuer,
                 IssuerSigningKey = this.issuerSigningKey
             };
         }

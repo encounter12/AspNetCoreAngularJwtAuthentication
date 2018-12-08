@@ -3,11 +3,11 @@ using System.Reflection;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
-    public class CryptoKeysProvider : ICryptoKeysProvider
+    public class CryptoRsaKeyProvider : ICryptoRsaKeyProvider
     {
         private readonly string cryptoKeysAbsoluteDirectory;
 
-        public CryptoKeysProvider()
+        public CryptoRsaKeyProvider()
         {
             this.cryptoKeysAbsoluteDirectory = this.GetCryptoKeysAbsoluteDirectory();
         }
@@ -34,7 +34,7 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
         private string GetCryptoKeysAbsoluteDirectory()
         {
-            string cryptoKeysRelativeDirectory = "Keys";
+            string cryptoKeysRelativeDirectory = @"Keys/RSA";
 
             var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 

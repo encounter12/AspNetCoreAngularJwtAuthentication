@@ -30,12 +30,9 @@ namespace AspNetCoreJwtAuthentication.Api
 {
     public class Startup
     {
-        private readonly JwtSettings jwtSettings;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            this.jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();
         }
 
         public IConfiguration Configuration { get; }
@@ -43,13 +40,14 @@ namespace AspNetCoreJwtAuthentication.Api
         public void ConfigureServices(IServiceCollection services)
         {
             AppData appData = Configuration.GetSection("AppData").Get<AppData>();
+            JwtSettings jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
             services.AddDependencyInjectionContainer(
                 DiContainers.AspNetCoreDependencyInjector,
                 appData,
-                this.jwtSettings);
+                jwtSettings);
 
-            var serviceProvider = services.BuildServiceProvider();
-            var jwtHandler = serviceProvider.GetService<IJwtHandler>();
+            var jwtHandler = services.BuildServiceProvider().GetService<IJwtHandler>();
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -104,7 +102,7 @@ namespace AspNetCoreJwtAuthentication.Api
 
             app.UseCors("CorsPolicy");
 
-            app.UseJwtTokenIssuer(this.jwtSettings, PrincipalResolver);
+            app.UseJwtTokenIssuer(PrincipalResolver);
 
             app.UseMvc();
         }

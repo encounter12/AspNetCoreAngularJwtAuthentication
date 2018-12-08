@@ -5,28 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
-using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
 using AspNetCoreJwtAuthentication.Data.Context;
+using AspNetCoreJwtAuthentication.Services.Configuration;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
     public class JwtTokenIssuerMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly JwtSettings jwtSettings;
+        private readonly IConfigurationService configurationService;
         private readonly Func<HttpContext, Task<GenericPrincipal>> principalResolver;
 
         public JwtTokenIssuerMiddleware(
             RequestDelegate next,
-            IOptions<JwtSettings> jwtSettings,
+            IConfigurationService configurationService,
             Func<HttpContext, Task<GenericPrincipal>> principalResolver)
         {
             this.next = next;
-            this.jwtSettings = jwtSettings.Value;
+            this.configurationService = configurationService;
             this.principalResolver = principalResolver;
         }
 
@@ -35,7 +34,7 @@ namespace AspNetCoreJwtAuthentication.Middleware
             ApplicationDbContext applicationDbContext, 
             IJwtHandler jwtHandler)
         {
-            string urlPath = this.jwtSettings.Path ?? "/token";
+            string urlPath = this.configurationService.JwtSettings?.Path ?? "/token";
 
             if (!httpContext.Request.Path.Equals(urlPath, StringComparison.OrdinalIgnoreCase))
             {

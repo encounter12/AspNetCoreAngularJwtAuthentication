@@ -11,6 +11,7 @@ using AspNetCoreJwtAuthentication.Data.UnitOfWork;
 using AspNetCoreJwtAuthentication.DI.Enums;
 using AspNetCoreJwtAuthentication.Middleware;
 using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using AspNetCoreJwtAuthentication.Services.Configuration;
 
 namespace AspNetCoreJwtAuthentication.DI
 {
@@ -48,13 +49,17 @@ namespace AspNetCoreJwtAuthentication.DI
 
         public static void BindJwtTokenHandler(IServiceCollection services, JwtSettings jwtSettings)
         {
+            services.AddSingleton<IConfigurationService>(s => new ConfigurationService(jwtSettings));
+            services.AddSingleton<ICryptoRsaKeyProvider, CryptoRsaKeyProvider>();
+            services.AddSingleton<ICryptoHmacShaKeyProvider, CryptoHmacShaKeyProvider>();
+
             if (jwtSettings.Alg == SecurityAlgorithms.HmacSha256)
             {
-                services.AddSingleton<IJwtHandler>(new JwtHandlerHmacSha256(jwtSettings));
+                services.AddScoped<IJwtHandler, JwtHandlerHmacSha256>();
             }
             else if (jwtSettings.Alg == SecurityAlgorithms.RsaSha256)
             {
-                services.AddSingleton<IJwtHandler>(new JwtHandlerRsaSha256(jwtSettings, new CryptoKeysProvider()));
+                services.AddScoped<IJwtHandler, JwtHandlerRsaSha256>();
             }
             else
             {

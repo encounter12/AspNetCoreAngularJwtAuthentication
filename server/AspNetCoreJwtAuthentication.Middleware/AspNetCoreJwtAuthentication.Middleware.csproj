@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.Data\AspNetCoreJwtAuthentication.Data.csproj" />
     <ProjectReference Include="..\AspNetCoreJwtAuthentication.Models\AspNetCoreJwtAuthentication.Models.csproj" />
+    <ProjectReference Include="..\AspNetCoreJwtAuthentication.Services\AspNetCoreJwtAuthentication.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,14 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Keys\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Keys\privateKey.pem">
+    <None Update="Keys\RSA\privateKey.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Keys\publicKey.pem">
+    <None Update="Keys\RSA\publicKey.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

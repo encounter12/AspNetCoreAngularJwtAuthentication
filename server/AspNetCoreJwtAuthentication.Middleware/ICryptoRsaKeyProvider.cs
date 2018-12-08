@@ -1,6 +1,6 @@
 ﻿namespace AspNetCoreJwtAuthentication.Middleware
 {
-    public interface ICryptoKeysProvider
+    public interface ICryptoRsaKeyProvider
     {
         string GetPrivateKey();
 

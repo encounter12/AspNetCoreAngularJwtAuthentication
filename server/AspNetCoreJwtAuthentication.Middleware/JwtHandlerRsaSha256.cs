@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
@@ -12,24 +11,24 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
-using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
+using AspNetCoreJwtAuthentication.Services.Configuration;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
     public class JwtHandlerRsaSha256 : IJwtHandler
     {
-        private readonly ICryptoKeysProvider cryptoKeysProvider;
+        private readonly ICryptoRsaKeyProvider cryptoRsaKeyProvider;
 
-        private readonly JwtSettings jwtSettings;
+        private readonly IConfigurationService configurationService;
 
         private SecurityKey issuerSigningKey;
 
         public TokenValidationParameters Parameters { get; private set; }
 
-        public JwtHandlerRsaSha256(JwtSettings jwtSettings, ICryptoKeysProvider cryptoKeysProvider)
+        public JwtHandlerRsaSha256(IConfigurationService configurationService, ICryptoRsaKeyProvider cryptoRsaKeyProvider)
         {
-            this.jwtSettings = jwtSettings;
-            this.cryptoKeysProvider = cryptoKeysProvider;
+            this.configurationService = configurationService;
+            this.cryptoRsaKeyProvider = cryptoRsaKeyProvider;
             InitializeRsa256();
             InitializeJwtParameters();
         }
@@ -52,7 +51,7 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
             existingClaims.AddRange(systemClaims);
 
-            string privateKeyFileContent = this.cryptoKeysProvider.GetPrivateKey();
+            string privateKeyFileContent = this.cryptoRsaKeyProvider.GetPrivateKey();
 
             var token = this.CreateToken(existingClaims, utcNow, privateKeyFileContent);
 
@@ -86,11 +85,11 @@ namespace AspNetCoreJwtAuthentication.Middleware
                 var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
 
                 var token = new JwtSecurityToken(
-                    issuer: jwtSettings.Issuer,
-                    audience: jwtSettings.Issuer,
+                    issuer: this.configurationService.JwtSettings?.Issuer,
+                    audience: this.configurationService.JwtSettings?.Issuer,
                     claims: claims,
                     notBefore: utcNow,
-                    expires: utcNow.AddMinutes(this.jwtSettings.ExpiresIn),
+                    expires: utcNow.AddMinutes(this.configurationService.JwtSettings?.ExpiresIn ?? 30),
                     signingCredentials: signingCredentials);
 
                 string writtenToken = new JwtSecurityTokenHandler().WriteToken(token);
@@ -101,7 +100,7 @@ namespace AspNetCoreJwtAuthentication.Middleware
 
         private void InitializeRsa256()
         {
-            string publicKeyFileContent = this.cryptoKeysProvider.GetPublicKey();
+            string publicKeyFileContent = this.cryptoRsaKeyProvider.GetPublicKey();
 
             RSA publicRsa = this.BuildCryptoServiceProvider(publicKeyFileContent);
             this.issuerSigningKey = new RsaSecurityKey(publicRsa);
@@ -135,23 +134,10 @@ namespace AspNetCoreJwtAuthentication.Middleware
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = this.jwtSettings.Issuer,
-                ValidAudience = this.jwtSettings.Issuer,
+                ValidIssuer = this.configurationService.JwtSettings?.Issuer,
+                ValidAudience = this.configurationService.JwtSettings?.Issuer,
                 IssuerSigningKey = this.issuerSigningKey
             };
-        }
-
-        private string GetCryptoKeysAbsoluteDirectory()
-        {
-            string cryptoKeysRelativeDirectory = "Keys";
-
-            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            string cryptoKeysAbsoluteDirectory = Path.Combine(
-                currentAssemblyDirectory,
-                cryptoKeysRelativeDirectory);
-
-            return cryptoKeysAbsoluteDirectory;
         }
     }
 }

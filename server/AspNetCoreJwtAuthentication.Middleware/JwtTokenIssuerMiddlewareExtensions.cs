@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-
-using AspNetCoreJwtAuthentication.Models.InfrastructureModels;
 
 namespace AspNetCoreJwtAuthentication.Middleware
 {
@@ -14,12 +11,9 @@ namespace AspNetCoreJwtAuthentication.Middleware
     {
         public static void UseJwtTokenIssuer(
             this IApplicationBuilder app,
-            JwtSettings jwtSettings,
             Func<HttpContext, Task<GenericPrincipal>> principalResolver)
         {
-            app.UseMiddleware<JwtTokenIssuerMiddleware>(
-                new OptionsWrapper<JwtSettings>(jwtSettings),
-                principalResolver);
+            app.UseMiddleware<JwtTokenIssuerMiddleware>(principalResolver);
         }
     }
 }
